@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+{% block title %}{{ product.name }} — GreenLeaf{% endblock %}
+{% block page_title %}Product Details{% endblock %}
+{% block content %}
+<div class="row justify-content-center">
+<div class="col-md-8">
+<div class="card">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <span class="fw-bold fs-5">{{ product.name }}</span>
+        {% if user.is_staff %}
+        <div>
+            <a href="{% url 'product_edit' product.id %}" class="btn btn-sm btn-primary">Edit</a>
+            <a href="{% url 'product_delete' product.id %}" class="btn btn-sm btn-outline-danger">Delete</a>
+        </div>
+        {% endif %}
+    </div>
+    <div class="card-body">
+        <div class="row g-3">
+            <div class="col-md-6"><strong>Category:</strong> {{ product.category }}</div>
+            <div class="col-md-6"><strong>Unit Price:</strong> ₹{{ product.unit_price }}</div>
+            <div class="col-md-6"><strong>Stock Quantity:</strong> <span class="{% if product.is_low_stock %}text-danger fw-bold{% endif %}">{{ product.stock_qty }}</span></div>
+            <div class="col-md-6"><strong>Reorder Level:</strong> {{ product.reorder_level }}</div>
+            <div class="col-md-6"><strong>Expiry Date:</strong> {{ product.expiry_date|default:'Not specified' }}</div>
+            <div class="col-md-6"><strong>Supplier:</strong> {{ product.supplier.name|default:'None' }}</div>
+            <div class="col-md-6"><strong>Barcode:</strong> {{ product.barcode|default:'None' }}</div>
+            <div class="col-md-6"><strong>Status:</strong>
+                {% if product.is_expired %}<span class="badge bg-danger">Expired</span>
+                {% elif product.is_near_expiry %}<span class="badge bg-warning text-dark">Near Expiry</span>
+                {% elif product.is_low_stock %}<span class="badge bg-warning text-dark">Low Stock</span>
+                {% else %}<span class="badge bg-success">In Stock</span>{% endif %}
+            </div>
+        </div>
+        <div class="mt-4">
+            <a href="{% url 'product_list' %}" class="btn btn-outline-secondary">← Back to Products</a>
+        </div>
+    </div>
+</div>
+</div>
+</div>
+{% endblock %}

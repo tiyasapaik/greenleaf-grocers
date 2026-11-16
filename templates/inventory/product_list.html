@@ -1,0 +1,110 @@
+{% extends 'base.html' %}
+{% block title %}Products — GreenLeaf Grocers{% endblock %}
+{% block page_title %}Product Inventory{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <div>
+        <h5 class="mb-0 fw-bold">Products</h5>
+        <small class="text-muted">{{ products|length }} item(s) found</small>
+    </div>
+    {% if is_admin %}
+    <div class="d-flex gap-2">
+        <a href="{% url 'product_add' %}" class="btn btn-primary btn-sm"><i class="bi bi-plus-circle"></i> Add Product</a>
+        <a href="{% url 'import_products_csv' %}" class="btn btn-outline-secondary btn-sm"><i class="bi bi-upload"></i> Import CSV</a>
+        <a href="{% url 'export_products_csv' %}" class="btn btn-outline-secondary btn-sm"><i class="bi bi-download"></i> Export CSV</a>
+    </div>
+    {% endif %}
+</div>
+
+<!-- Search & Filter -->
+<div class="card mb-3">
+    <div class="card-body py-2">
+        <form method="get" class="row g-2 align-items-end">
+            <div class="col-md-4">
+                <input type="text" name="q" value="{{ query }}" class="form-control form-control-sm" placeholder="Search by name or barcode...">
+            </div>
+            <div class="col-md-3">
+                <select name="category" class="form-select form-select-sm">
+                    <option value="">All Categories</option>
+                    {% for c in categories %}
+                    <option value="{{ c.0 }}" {% if category == c.0 %}selected{% endif %}>{{ c.1 }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-2">
+                <select name="stock" class="form-select form-select-sm">
+                    <option value="">All Stock</option>
+                    <option value="low" {% if stock_filter == 'low' %}selected{% endif %}>⚠ Low Stock</option>
+                    <option value="expiry" {% if stock_filter == 'expiry' %}selected{% endif %}>📅 Near Expiry</option>
+                </select>
+            </div>
+            <div class="col-md-2">
+                <button type="submit" class="btn btn-primary btn-sm w-100"><i class="bi bi-search"></i> Search</button>
+            </div>
+            <div class="col-md-1">
+                <a href="{% url 'product_list' %}" class="btn btn-outline-secondary btn-sm w-100">Clear</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Products Table -->
+<div class="card">
+    <div class="card-body p-0">
+        <table class="table table-hover mb-0">
+            <thead>
+                <tr>
+                    <th>Product</th><th>Category</th><th>Price</th><th>Stock</th>
+                    <th>Reorder Level</th><th>Expiry</th><th>Status</th>
+                    {% if is_admin %}<th>Actions</th>{% endif %}
+                </tr>
+            </thead>
+            <tbody>
+            {% for p in products %}
+            <tr>
+                <td>
+                    <a href="{% url 'product_detail' p.id %}" class="fw-semibold text-decoration-none text-dark">{{ p.name }}</a>
+                    {% if p.barcode %}<br><small class="text-muted">{{ p.barcode }}</small>{% endif %}
+                </td>
+                <td><span class="badge" style="background:#d8f3dc;color:#1b4332;">{{ p.category }}</span></td>
+                <td class="fw-semibold">₹{{ p.unit_price|floatformat:2 }}</td>
+                <td>
+                    {% if p.is_low_stock %}
+                    <span class="fw-bold text-warning">{{ p.stock_qty }}</span>
+                    {% else %}
+                    {{ p.stock_qty }}
+                    {% endif %}
+                </td>
+                <td>{{ p.reorder_level }}</td>
+                <td>
+                    {% if p.expiry_date %}
+                        {% if p.is_expired %}
+                        <span class="text-danger fw-bold">{{ p.expiry_date }} EXPIRED</span>
+                        {% elif p.is_near_expiry %}
+                        <span class="text-warning fw-bold">{{ p.expiry_date }}</span>
+                        {% else %}
+                        {{ p.expiry_date }}
+                        {% endif %}
+                    {% else %}-{% endif %}
+                </td>
+                <td>
+                    {% if p.is_expired %}<span class="badge bg-danger">Expired</span>
+                    {% elif p.is_near_expiry %}<span class="badge bg-warning text-dark">Near Expiry</span>
+                    {% elif p.is_low_stock %}<span class="badge bg-warning text-dark">Low Stock</span>
+                    {% else %}<span class="badge bg-success">OK</span>{% endif %}
+                </td>
+                {% if is_admin %}
+                <td>
+                    <a href="{% url 'product_edit' p.id %}" class="btn btn-xs btn-outline-primary btn-sm py-0 px-2">Edit</a>
+                    <a href="{% url 'product_delete' p.id %}" class="btn btn-xs btn-outline-danger btn-sm py-0 px-2">Del</a>
+                </td>
+                {% endif %}
+            </tr>
+            {% empty %}
+            <tr><td colspan="8" class="text-center text-muted py-4">No products found. <a href="{% url 'product_add' %}">Add one →</a></td></tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

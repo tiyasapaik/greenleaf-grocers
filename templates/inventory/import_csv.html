@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+{% block title %}Import Products CSV — GreenLeaf{% endblock %}
+{% block page_title %}Import Products CSV{% endblock %}
+{% block content %}
+<div class="row justify-content-center">
+<div class="col-md-6">
+<div class="card">
+    <div class="card-header fw-semibold"><i class="bi bi-file-earmark-spreadsheet"></i> Upload Products CSV</div>
+    <div class="card-body">
+        <p class="text-muted small">Upload a CSV file with columns: <code>name, category, unit_price, stock_qty, reorder_level, expiry_date, barcode</code>.</p>
+        <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            <div class="mb-3">
+                {{ form.csv_file }}
+            </div>
+            <button type="submit" class="btn btn-primary"><i class="bi bi-upload"></i> Import CSV</button>
+            <a href="{% url 'product_list' %}" class="btn btn-outline-secondary">Cancel</a>
+        </form>
+    </div>
+</div>
+</div>
+</div>
+{% endblock %}

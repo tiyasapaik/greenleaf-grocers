@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+{% block title %}Sales History — GreenLeaf Grocers{% endblock %}
+{% block page_title %}Sales History{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h5 class="fw-bold mb-0">Recorded Sales Transactions</h5>
+    {% if user.is_staff %}
+    <a href="{% url 'export_sales_csv' %}" class="btn btn-outline-secondary btn-sm"><i class="bi bi-download"></i> Export CSV</a>
+    {% endif %}
+</div>
+<div class="card">
+    <div class="card-body p-0">
+        <table class="table table-hover mb-0">
+            <thead>
+                <tr>
+                    <th>Sale ID</th><th>Date</th><th>Time</th><th>Cashier</th>
+                    <th>Items</th><th>Total</th><th>Discount</th><th>Final Amount</th><th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for s in sales %}
+            <tr>
+                <td class="fw-bold">#{{ s.id }}</td>
+                <td>{{ s.sale_date }}</td>
+                <td>{{ s.sale_time|time:"H:i" }}</td>
+                <td>{{ s.cashier.username }}</td>
+                <td>{{ s.items.count }}</td>
+                <td>₹{{ s.total_amount|floatformat:2 }}</td>
+                <td>{{ s.discount }}%</td>
+                <td class="fw-bold text-success">₹{{ s.final_amount|floatformat:2 }}</td>
+                <td>
+                    <a href="{% url 'receipt' s.id %}" class="btn btn-sm btn-outline-primary py-0 px-2">View</a>
+                    <a href="{% url 'receipt_pdf' s.id %}" class="btn btn-sm btn-outline-danger py-0 px-2">PDF</a>
+                </td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="9" class="text-center text-muted py-4">No sales recorded yet.</td></tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

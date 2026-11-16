@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+{% block title %}Delete Product — GreenLeaf{% endblock %}
+{% block page_title %}Delete Product{% endblock %}
+{% block content %}
+<div class="row justify-content-center">
+<div class="col-md-6">
+<div class="card border-danger">
+    <div class="card-header bg-danger text-white fw-semibold">Confirm Deletion</div>
+    <div class="card-body text-center p-4">
+        <i class="bi bi-exclamation-triangle text-danger display-4 mb-3 d-block"></i>
+        <h5>Are you sure you want to delete <strong>{{ product.name }}</strong>?</h5>
+        <p class="text-muted">Category: {{ product.category }} | Current Stock: {{ product.stock_qty }}</p>
+        <form method="post" class="d-flex justify-content-center gap-3 mt-4">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-danger px-4">Yes, Delete</button>
+            <a href="{% url 'product_list' %}" class="btn btn-secondary px-4">Cancel</a>
+        </form>
+    </div>
+</div>
+</div>
+</div>
+{% endblock %}
